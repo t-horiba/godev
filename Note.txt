@@ -2,3 +2,6 @@
 $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 $ brew install go
 $ go version
+
+$ git config --global 'ユーザー名'
+$ git config --global 'メールアドレス'

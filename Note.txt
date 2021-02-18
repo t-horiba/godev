@@ -12,3 +12,13 @@ $ git config --global user.email 'メールアドレス'
 4.コミット
 5.プル＆プッシュでリモートリポジトリに反映
 
+
+ディレクトリを作成する度に必要
+$ cd godev
+$ mkdir xxx
+$ cd xxx
+$ go mod init xxx
+
+
+macではVSCodeの設定でwindow.restoreWindows=allになっていても、起動する度にフォルダを開く必要がある面倒
+→DockでVSCodeをダブルタップ、表示されるメニューから開きたいフォルダを選択する

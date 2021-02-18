@@ -5,3 +5,5 @@ $ go version
 
 $ git config --global 'ユーザー名'
 $ git config --global 'メールアドレス'
+
+リポジトリをクローン

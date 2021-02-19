@@ -15,13 +15,34 @@ func main() {
 		return
 	}
 
-	cell, err := f.GetCellValue("Sheet1", "B2")
+	cell1, err := f.GetCellValue("Sheet1", "A1")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	fmt.Println(cell1)
 
-	fmt.Println(cell)
+	cell2, err := f.GetCellValue("Sheet1", "B1")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(cell2)
+
+	cell3, err := f.GetCellValue("Sheet1", "E1")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(cell3)
+
+	cell4, err := f.GetCellValue("Sheet1", "G1")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(cell4)
+
 	rows, err := f.GetRows("Sheet1")
 	for _, row := range rows {
 		for _, colCell := range row {

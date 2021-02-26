@@ -1,0 +1,14 @@
+{
+    "connect" :
+    {
+        "hostname" : "dummy_hostname",
+        "port" : "dummy_port"
+    },
+    "auth" :
+    {
+        "username" : "dummy_username",
+        "password" : "dummy_password"
+    },
+    "item1" : "dummy_item1",
+    "item2" : "dummy_item2"
+}

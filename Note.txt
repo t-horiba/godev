@@ -22,3 +22,7 @@ $ go mod init xxx
 
 macではVSCodeの設定でwindow.restoreWindows=allになっていても、起動する度にフォルダを開く必要がある面倒
 →DockでVSCodeをダブルタップ、表示されるメニューから開きたいフォルダを選択する
+
+ファイル→ユーザ設定→設定
+検索窓でgo formatを入力
+Go:Fromat Toolを"gofmt"に変更

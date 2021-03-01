@@ -1,6 +1,7 @@
 package main
 
 // 参考：https://qiita.com/immrshc/items/13199f420ebaf0f0c37c
+// go get github.com/pkg/errors
 
 import (
 	"encoding/json"
@@ -11,13 +12,18 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ErrorType はエラーの種別を表す
 type ErrorType uint
 
 const (
-	Unknown          ErrorType = iota
-	InvalidArgument            // = iota
-	Unauthorized               // = iota
-	ConnectionFailed           // = iota
+	// Unknown は予期しないエラーを表す
+	Unknown ErrorType = iota
+	// InvalidArgument は引数エラーを表す
+	InvalidArgument // = iota
+	// Unauthorized は認証エラーを表す
+	Unauthorized // = iota
+	// ConnectionFailed は接続失敗を表す
+	ConnectionFailed // = iota
 )
 
 type typeGetter interface {
@@ -29,22 +35,27 @@ type customError struct {
 	originalError error
 }
 
+// New 関数
 func (et ErrorType) New(message string) error {
 	return customError{errorType: et, originalError: errors.New(message)}
 }
 
+// Wrap 関数
 func (et ErrorType) Wrap(err error, message string) error {
 	return customError{errorType: et, originalError: errors.Wrap(err, message)}
 }
 
+// Error 関数
 func (e customError) Error() string {
 	return e.originalError.Error()
 }
 
+// Type 関数
 func (e customError) Type() ErrorType {
 	return e.errorType
 }
 
+// Wrap 関数
 func Wrap(err error, message string) error {
 	we := errors.Wrap(err, message)
 	if ce, ok := err.(typeGetter); ok {
@@ -53,10 +64,12 @@ func Wrap(err error, message string) error {
 	return customError{errorType: Unknown, originalError: we}
 }
 
+// Cause 関数
 func Cause(err error) error {
 	return errors.Cause(err)
 }
 
+// GetType 関数
 func GetType(err error) ErrorType {
 	for {
 		if e, ok := err.(typeGetter); ok {
@@ -67,6 +80,7 @@ func GetType(err error) ErrorType {
 	return Unknown
 }
 
+// main 関数
 func main() {
 	if _, err := unmarshalToMap("src.json"); err != nil {
 		switch err2 := err.(type) {
@@ -94,6 +108,7 @@ func main() {
 	}
 }
 
+// unmarshalToMap 関数
 func unmarshalToMap(src string) (map[string]interface{}, error) {
 	jsonMap := map[string]interface{}{}
 	data, err := ioutil.ReadFile(src)

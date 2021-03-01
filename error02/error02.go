@@ -7,67 +7,75 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 
 	"github.com/pkg/errors"
 )
 
-// ErrorType はエラーの種別を表す
+// ErrorType はエラーの種別を表し、New メソッド、Wrap メソッドを含む
 type ErrorType uint
+
+// New メソッド
+func (et ErrorType) New(message string) error {
+	return customError{errorType: et, originalError: errors.New(message)}
+}
+
+// Wrap メソッド
+func (et ErrorType) Wrap(err error, message string) error {
+	return customError{errorType: et, originalError: errors.Wrap(err, message)}
+}
 
 const (
 	// Unknown は予期しないエラーを表す
 	Unknown ErrorType = iota
 	// InvalidArgument は引数エラーを表す
-	InvalidArgument // = iota
+	InvalidArgument // ErrorType = iota
 	// Unauthorized は認証エラーを表す
-	Unauthorized // = iota
+	Unauthorized // ErrorType = iota
 	// ConnectionFailed は接続失敗を表す
-	ConnectionFailed // = iota
+	ConnectionFailed // ErrorType = iota
 )
 
+// typeGetter インターフェースの宣言
 type typeGetter interface {
+	// メソッドリスト
 	Type() ErrorType
 }
 
+// customError 構造体の宣言
 type customError struct {
-	errorType     ErrorType
+	// フィールドリスト
+	errorType ErrorType
+	// Error() メソッドを含む構造体を代入
 	originalError error
+	// Error() メソッド
+	// Type() メソッド
 }
 
-// New 関数
-func (et ErrorType) New(message string) error {
-	return customError{errorType: et, originalError: errors.New(message)}
-}
-
-// Wrap 関数
-func (et ErrorType) Wrap(err error, message string) error {
-	return customError{errorType: et, originalError: errors.Wrap(err, message)}
-}
-
-// Error 関数
+// Error メソッド
 func (e customError) Error() string {
 	return e.originalError.Error()
 }
 
-// Type 関数
+// Type メソッド
 func (e customError) Type() ErrorType {
 	return e.errorType
 }
 
 // Wrap 関数
-func Wrap(err error, message string) error {
-	we := errors.Wrap(err, message)
-	if ce, ok := err.(typeGetter); ok {
-		return customError{errorType: ce.Type(), originalError: we}
-	}
-	return customError{errorType: Unknown, originalError: we}
-}
+//func Wrap(err error, message string) error {
+//	we := errors.Wrap(err, message)
+//	if ce, ok := err.(typeGetter); ok {
+//		return customError{errorType: ce.Type(), originalError: we}
+//	}
+//	return customError{errorType: Unknown, originalError: we}
+//}
 
 // Cause 関数
-func Cause(err error) error {
-	return errors.Cause(err)
-}
+//func Cause(err error) error {
+//	return errors.Cause(err)
+//}
 
 // GetType 関数
 func GetType(err error) ErrorType {
@@ -82,6 +90,42 @@ func GetType(err error) ErrorType {
 
 // main 関数
 func main() {
+	err := Unauthorized.New("認証エラー")
+	fmt.Println(statusCode(err))
+
+	err = panicAndRecover()
+	fmt.Println(err)
+
+	if _, err1 := unmarshalToMap("src.json"); err1 != nil {
+		err1 = InvalidArgument.Wrap(err1, "引数エラー")
+		fmt.Println(statusCode(err1))
+		fmt.Println(err1.Error())
+		fmt.Printf("%+v\n", err1)
+	}
+}
+
+func statusCode(err error) int {
+	switch GetType(err) {
+	case ConnectionFailed:
+		return http.StatusInternalServerError
+	case Unauthorized:
+		return http.StatusUnauthorized
+	default:
+		return http.StatusBadRequest
+	}
+}
+
+func panicAndRecover() (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("recovered: %v\n", r))
+		}
+	}()
+	panic("panic at panicAndRecover")
+	// return
+}
+
+func main2() {
 	if _, err := unmarshalToMap("src.json"); err != nil {
 		switch err2 := err.(type) {
 		case *os.PathError:

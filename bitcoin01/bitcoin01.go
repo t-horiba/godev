@@ -23,6 +23,27 @@ type Ticker struct {
 func main() {
 	fmt.Println("Start!")
 
+	// 1分毎に何かを実行するテスト Start
+	SystemTime := time.Now()
+	ExecTime := SystemTime.Add(time.Minute * 1)
+
+	fmt.Printf("%s\n", SystemTime.Format("2006/01/02 15:04:05"))
+
+	for i := 0; i < 2; i++ {
+		for {
+			SystemTime = time.Now()
+			// (ExecTime > SystemTime)の否定
+			// (ExecTime <= SystemTime)
+			if !ExecTime.After(SystemTime) {
+				ExecTime = SystemTime.Add(time.Minute * 1)
+				fmt.Printf("%s\n", SystemTime.Format("2006/01/02 15:04:05"))
+				break
+			}
+			time.Sleep(time.Millisecond * 100)
+		}
+	}
+	// 1分毎に何かを実行するテスト End
+
 	url := "https://coincheck.com/api/ticker"
 
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
